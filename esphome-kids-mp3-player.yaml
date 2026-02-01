@@ -1,0 +1,267 @@
+esphome:
+  name: esphome-kids-mp3-player
+  friendly_name: ESPHome_Kids_MP3_Player
+
+esp32:
+  board: esp32dev
+  framework:
+    type: esp-idf
+
+# Enable logging
+logger:
+
+# Enable Home Assistant API
+api:
+  encryption:
+    key: "mT7tM3BLJVqEH98+g2M5HHnuwkhzPwoUN6wm5auj86A="
+
+ota:
+  - platform: esphome
+    password: "e8a80a78e726399ed6d6c1c6ab63bd01"
+
+wifi:
+  ssid: !secret wifi_ssid
+  password: !secret wifi_password
+
+  # Enable fallback hotspot (captive portal) in case wifi connection fails
+  ap:
+    ssid: "Esphome-Kids-Mp3-Player"
+    password: !secret wifi_captive_portal_password
+
+captive_portal:
+
+# Example configuration entry
+web_server:
+  port: 80
+
+# UART pro DFPlayer (typicky UART2 na ESP32)
+uart:
+  id: df_uart
+  tx_pin: GPIO17
+  rx_pin: GPIO16
+  baud_rate: 9600
+
+dfplayer:
+  id: player
+  uart_id: df_uart
+
+# Uložíme si vybraný track (1..150)
+globals:
+  - id: selected_track
+    type: int
+    restore_value: true
+    initial_value: '1'
+
+# Dropdown v HA
+select:
+  - platform: template
+    name: "Skladba"
+    id: track_select
+    optimistic: true
+    restore_value: true
+    # POZN: options je potřeba vypsat (níže dávám generátor)
+
+    options:
+      - "01 - Aladdin"
+      - "02 - Snow White"
+      - "03 - Lion King"
+      - "04 - Finding Nemo"
+      - "05 - Jungle Book"
+      - "06 - Toy Story"
+      - "07 - Peter Pan"
+      - "08 - Dumbo"
+      - "09 - Mermaid"
+      - "10 - Pinocchio"
+      - "11 - Frozen"
+      - "12 - 101 Dalmatians"
+      - "13 - Beauty and the Beast"
+      - "14 - Cars"
+      - "15 - Cinderella"
+      - "16 - Alice in Wonderland"
+      - "17 - Lady and the Tramp"
+      - "18 - Tangled"
+      - "19 - Robin Hood"
+      - "20 - Ratatouille"
+      - "21 - Bambi"
+      - "22 - Monsters"
+      - "23 - Winnie the Pooh"
+      - "24 - Incredibles"
+      - "25 - Sleeping Beauty"
+      - "26 - Aristocats"
+      - "27 - Pocahontas"
+      - "28 - Sword in the Stone"
+      - "29 - Lilo & Stitch"
+      - "30 - Hunchback of Notre Dame"
+      - "31 - Zootopia"
+      - "32 - Rescuers"
+      - "33 - Inside Out"
+      - "34 - Mulan"
+      - "35 - Coco"
+      - "36 - A Bug's Life"
+      - "37 - Hercules"
+      - "38 - Moana"
+      - "39 - Fox and the Hound"
+      - "40 - Up"
+      - "41 - Tigger"
+      - "42 - Princess and the Frog"
+      - "43 - Wild"
+      - "44 - Brother Bear"
+      - "45 - Wreck-It Ralph"
+      - "46 - Frozen 2"
+      - "47 - Finding Dory"
+      - "48 - Great Mouse Detective"
+      - "49 - Bolt"
+      - "50 - Cars 2"
+      - "51 - Brave"
+      - "52 - Monsters University"
+      - "53 - Home on the Range"
+      - "54 - Toy Story 2"
+      - "55 - The Good Dinosaur"
+      - "56 - Incredibles 2"
+      - "57 - Atlantis"
+      - "58 - Wall-E"
+      - "59 - Big Hero 6"
+      - "60 - Oliver & Company"
+      - "61 - Lion King 2"
+      - "62 - Cars 3"
+      - "63 - Rescuers Down Under"
+      - "64 - Ralph Breaks the Internet"
+      - "65 - Toy Story 3"
+      - "66 - Brother Bear 2"
+      - "67 - Planes"
+      - "68 - Return to Neverland"
+      - "69 - Toy Story 4"
+      - "70 - Jungle Book 2"
+      - "71 - Piglet"
+      - "72 - Treasure Planet"
+      - "73 - Chicken Little"
+      - "74 - Black Cauldron"
+      - "75 - Meet the Robinsons"
+      - "76 - Bambi 2"
+      - "77 - 102 Dalmatians"
+      - "78 - Planes 2"
+      - "79 - Dinosaurs"
+      - "80 - Tinker Bell"
+      - "81 - Onward"
+      - "82 - Frozen Fever"
+      - "83 - Soul"
+      - "84 - Emperor's New Groove"
+      - "85 - Pooh's Heffalump"
+      - "86 - Olaf's Perfect Summer Day"
+      - "87 - Frozen Northern Lights"
+      - "88 - Beauty and the Beast 2"
+      - "89 - Lion Guard"
+      - "90 - Tinker Bell Secret Wings"
+      - "91 - Tinker Bell Pirate Fairy"
+      - "92 - Cinderella II"
+      - "93 - Little Mermaid Return to the Sea"
+      - "94 - Once Upon a Snowman"
+      - "95 - Aladdin and the King of Thieves"
+      - "96 - Moana 2"
+      - "97 - 101 Dalmatians 2"
+      - "98 - Raya and the Last Dragon"
+      - "99 - Luca"
+      - "100 - Encanto"
+      - "101 - Lightyear"
+      - "102 - Turning Red"
+      - "103 - The Great Cub-House Search"
+      - "104 - Stitch or Treat"
+      - "105 - New Adventures in the Hundred Acre Wood"
+      - "106 - Misadventures of Heihei"
+      - "107 - The Princess Polo Game"
+      - "108 - It Takes Two"
+      - "109 - Figaro's Day Out"
+      - "110 - A Basket of Trouble"
+      - "111 - Strange World"
+      - "112 - The Great Egg Hunt"
+      - "113 - Merida's Challenge"
+      - "114 - For the Love of Racing"
+      - "115 - A Day Out with Mom"
+      - "116 - Tiana's Winter Blues"
+      - "117 - Anna and Elsa's Childhood"
+      - "118 - The Surprise Party"
+      - "119 - Ariel's Beginning"
+      - "120 - The Riley and Bing Bong Band"
+      - "121 - Ride the Waves!"
+      - "122 - The Enchanted Unicorn Adventure"
+      - "123 - Timothy's Big Day"
+      - "124 - Red's Fire Brigade"
+      - "125 - Pepita and Dante to the Rescue"
+      - "126 - Panda Up!"
+      - "127 - Tinker Bell and the Lost Treasure"
+      - "128 - Wishing on a Star"
+      - "129 - Hades's New Nemesis"
+      - "130 - You're It, Dory!"
+      - "131 - Ducky and Bunny's Big Plan"
+      - "132 - To the Rescue"
+      - "133 - An Adventure for Wendy"
+      - "134 - The Winter Journey"
+      - "135 - Tiana's Growing Experiment"
+      - "136 - Mystery in the Rain Forest"
+      - "137 - The Legend of the Neverbeast"
+      - "138 - Fire Pup of the Day"
+      - "139 - Fortune Teller Fiasco"
+      - "140 - Cinderella III"
+      - "141 - A Super Christmas Caper"
+      - "142 - World of Car Racing"
+      - "143 - Coral Festival Chaos"
+      - "144 - Anna and Elsa's Hygge Life"
+      - "145 - Fast & Fabulous"
+      - "146 - Rival Next Door"
+      - "147 - Becoming Shiny"
+      - "148 - Officer McDimples on Duty!"
+      - "149 - Into the Internet"
+      - "150 - Coup at the Zoo"
+    initial_option: "01 - Aladdin"
+
+    on_value:
+      then:
+        - lambda: |-
+            // i = index vybrané položky (0..149)
+            id(selected_track) = i + 1;
+
+# Tlačítka
+button:
+  - platform: template
+    name: "Play"
+    icon: mdi:play
+    on_press:
+      then:
+        # Přehrát skladbu v /mp3 jako číslo 1..150
+        - dfplayer.play_mp3:
+            file: !lambda "return id(selected_track);"
+  - platform: template
+    name: "Stop"
+    icon: mdi:stop
+    on_press:
+      then:
+        - dfplayer.stop
+
+  - platform: template
+    name: "Next"
+    icon: mdi:skip-next
+    on_press:
+      then:
+        - dfplayer.play_next
+
+  - platform: template
+    name: "Prev"
+    icon: mdi:skip-previous
+    on_press:
+      then:
+        - dfplayer.play_previous
+
+# Volume jako slider v HA (0..30)
+number:
+  - platform: template
+    name: "Hlasitost"
+    id: df_volume
+    min_value: 0
+    max_value: 30
+    step: 1
+    optimistic: true
+    restore_value: true
+    mode: slider
+    on_value:
+      then:
+        - dfplayer.set_volume: !lambda "return (int) x;"
